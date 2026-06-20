@@ -75,8 +75,7 @@
   }
   .quiz-progress { font-size:13px; color:var(--gray-dark); font-weight:600; }
   .quiz-timer { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:700; color:var(--green-dark); }
-  .quiz-timer.warning { color:var(--gold); }
-  .quiz-timer.danger { color:var(--red); animation:pulse 0.5s infinite alternate; }
+  
   @keyframes pulse { from{transform:scale(1)} to{transform:scale(1.15)} }
 
   .quiz-body { padding:24px 20px; }
@@ -174,7 +173,7 @@
       </p>
       <div class="meta">
         <span class="meta-chip">10 Pertanyaan</span>
-        <span class="meta-chip">⏱ 20 detik/soal</span>
+        <span class="meta-chip">♾ Tanpa batas waktu</span>
         <span class="meta-chip">📝 +Penjelasan</span>
       </div>
 
@@ -194,7 +193,7 @@
   <div class="screen" id="screen-quiz">
     <div class="quiz-header">
       <span class="quiz-progress" id="progress">1/10</span>
-      <span class="quiz-timer" id="timer">⏱ 20</span>
+      <span class="quiz-timer" id="timer" style="display:none"></span>
     </div>
     <div class="quiz-body">
       <div class="question-num" id="qNum">PERTANYAAN 1</div>
@@ -421,27 +420,12 @@ function showQuestion() {
 }
 
 function startTimer() {
+  // Timer dimatikan — biar DR santai tanpa diburu-buru
   clearInterval(timerInterval);
-  timeLeft = 20;
-  document.getElementById('timer').textContent = `⏱ ${timeLeft}`;
-  document.getElementById('timer').className = 'quiz-timer';
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    document.getElementById('timer').textContent = `⏱ ${timeLeft}`;
-    if (timeLeft <= 5) document.getElementById('timer').className = 'quiz-timer danger';
-    else if (timeLeft <= 10) document.getElementById('timer').className = 'quiz-timer warning';
-    if (timeLeft <= 0) { clearInterval(timerInterval); timeUp(); }
-  }, 1000);
 }
 
 function timeUp() {
-  if (answered) return;
-  answered = true; clearInterval(timerInterval);
-  const q = questions[currentQ];
-  document.querySelectorAll('.option').forEach(o => o.disabled = true);
-  document.querySelectorAll('.option')[q.answer].classList.add('correct');
-  answers.push({ q: currentQ, correct: false, userAnswer: -1 });
-  showFeedback(false);
+  // Timer dimatikan — fungsi tidak dipanggil lagi
 }
 
 function selectAnswer(index) {
@@ -464,7 +448,7 @@ function showFeedback(correct) {
     fb.className = 'feedback correct-fb'; fbTitle.textContent = '✅ Benar!';
   } else {
     fb.className = 'feedback wrong-fb';
-    fbTitle.textContent = timeLeft <= 0 ? '⏰ Waktu Habis!' : '❌ Kurang Tepat';
+    fbTitle.textContent = '❌ Kurang Tepat';
   }
   fbText.innerHTML = q.explain;
   const btn = document.getElementById('btnNext');
@@ -531,7 +515,7 @@ async function submitResults() {
       q: a.q,
       question: questions[a.q].q,
       correct: a.correct,
-      userAnswer: a.userAnswer >= 0 ? questions[a.q].opts[a.userAnswer] : '(waktu habis)',
+      userAnswer: a.userAnswer >= 0 ? questions[a.q].opts[a.userAnswer] : '',
       correctAnswer: questions[a.q].opts[questions[a.q].answer]
     }))
   };
