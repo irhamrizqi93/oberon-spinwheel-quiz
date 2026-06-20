@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Oberon Spinwheel Quiz</title>
+<style>
+  :root {
+    --green: #1B8A3D;
+    --green-dark: #0F5C28;
+    --green-light: #E8F5E9;
+    --blue: #005DAA;
+    --gold: #F5A623;
+    --white: #FFFFFF;
+    --gray: #F5F5F5;
+    --gray-dark: #666;
+    --red: #E53935;
+    --correct: #2E7D32;
+    --wrong: #C62828;
+    --text: #333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 50%, #A5D6A7 100%);
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ===== INTRO ===== */
+  .intro {
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  .intro-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    box-shadow: 0 4px 20px rgba(27,138,61,0.3);
+  }
+
+  .intro h1 {
+    font-size: 22px;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+    font-weight: 800;
+  }
+
+  .intro .subtitle {
+    font-size: 13px;
+    color: var(--gray-dark);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .intro .meta {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .intro .meta-chip {
+    background: var(--green-light);
+    color: var(--green-dark);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 48px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+    touch-action: manipulation;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+
+  .btn-start {
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color: white;
+    box-shadow: 0 4px 16px rgba(27,138,61,0.35);
+    font-size: 18px;
+  }
+
+  .btn-start:hover { box-shadow: 0 6px 24px rgba(27,138,61,0.45); }
+
+  /* ===== QUIZ ===== */
+  .quiz { display: none; }
+
+  .quiz-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #E0E0E0;
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .quiz-progress {
+    font-size: 13px;
+    color: var(--gray-dark);
+    font-weight: 600;
+  }
+
+  .quiz-timer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green-dark);
+  }
+
+  .quiz-timer.warning { color: var(--gold); }
+  .quiz-timer.danger { color: var(--red); animation: pulse 0.5s infinite alternate; }
+
+  @keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.15); }
+  }
+
+  .quiz-body {
+    padding: 24px 20px;
+  }
+
+  .question-num {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .question-text {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    padding: 14px 18px;
+    border: 2px solid #E0E0E0;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    -webkit-appearance: none;
+    touch-action: manipulation;
+  }
+
+  .option:active { transform: scale(0.98); }
+  .option:hover { border-color: var(--green); background: var(--green-light); }
+
+  .option.selected {
+    border-color: var(--blue);
+    background: #E3F2FD;
+  }
+
+  .option.correct {
+    border-color: var(--correct) !important;
+    background: #E8F5E9 !important;
+    color: var(--correct) !important;
+  }
+
+  .option.wrong {
+    border-color: var(--wrong) !important;
+    background: #FFEBEE !important;
+    color: var(--wrong) !important;
+  }
+
+  .option:disabled { pointer-events: none; }
+
+  .feedback {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 14px;
+    display: none;
+    animation: fadeIn 0.3s;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .feedback.correct-fb {
+    background: #E8F5E9;
+    border: 1px solid #A5D6A7;
+    display: block;
+  }
+
+  .feedback.wrong-fb {
+    background: #FFEBEE;
+    border: 1px solid #EF9A9A;
+    display: block;
+  }
+
+  .feedback-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .feedback.correct-fb .feedback-title { color: var(--correct); }
+  .feedback.wrong-fb .feedback-title { color: var(--wrong); }
+
+  .feedback-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .btn-next {
+    margin-top: 16px;
+    width: 100%;
+    background: var(--green);
+    color: white;
+    font-size: 15px;
+    display: none;
+  }
+
+  .btn-next.show { display: block; }
+
+  /* ===== RESULT ===== */
+  .result { display: none; padding: 32px 24px; text-align: center; }
+
+  .result-score {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 6px 28px rgba(27,138,61,0.3);
+    flex-direction: column;
+  }
+
+  .result-score .score-num {
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+  }
+
+  .result-score .score-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 2px;
+  }
+
+  .result h2 {
+    font-size: 20px;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+  }
+
+  .result .result-desc {
+    font-size: 14px;
+    color: var(--gray-dark);
+    margin-bottom: 24px;
+  }
+
+  .result-review {
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .result-review h3 {
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .review-item {
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    border-left: 4px solid transparent;
+  }
+
+  .review-item.r-correct {
+    background: #F1F8E9;
+    border-left-color: var(--correct);
+    color: #1B5E20;
+  }
+
+  .review-item.r-wrong {
+    background: #FFF3F0;
+    border-left-color: var(--wrong);
+    color: #B71C1C;
+  }
+
+  .review-q {
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .review-a {
+    font-size: 12px;
+    opacity: 0.85;
+  }
+
+  .btn-restart {
+    background: var(--green-light);
+    color: var(--green-dark);
+    border: 2px solid var(--green);
+    width: 100%;
+  }
+
+  .btn-restart:hover { background: #C8E6C9; }
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+  <!-- ========== INTRO ========== -->
+  <div class="intro" id="intro">
+    <div class="intro-logo">🎡</div>
+    <h1>Oberon Spinwheel</h1>
+    <p class="subtitle">
+      Uji pemahamanmu tentang program<br>
+      <strong>Oberon Speed Petani</strong> — scan, spin, menang!
+    </p>
+    <div class="meta">
+      <span class="meta-chip">10 Pertanyaan</span>
+      <span class="meta-chip">⏱ 20 detik/soal</span>
+      <span class="meta-chip">🎯 Self-paced</span>
+    </div>
+    <button class="btn btn-start" onclick="startQuiz()">
+      Mulai Kuis 🚀
+    </button>
+  </div>
+
+  <!-- ========== QUIZ ========== -->
+  <div class="quiz" id="quiz">
+    <div class="quiz-header">
+      <span class="quiz-progress" id="progress">1/10</span>
+      <span class="quiz-timer" id="timer">⏱ 20</span>
+    </div>
+    <div class="quiz-body">
+      <div class="question-num" id="qNum">PERTANYAAN 1</div>
+      <div class="question-text" id="qText"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback">
+        <div class="feedback-title" id="fbTitle"></div>
+        <div class="feedback-text" id="fbText"></div>
+      </div>
+      <button class="btn btn-next" id="btnNext" onclick="nextQuestion()">
+        Lanjut →
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== RESULT ========== -->
+  <div class="result" id="result">
+    <div class="result-score">
+      <span class="score-num" id="scoreNum">0</span>
+      <span class="score-label">/ 10</span>
+    </div>
+    <h2 id="resultTitle"></h2>
+    <p class="result-desc" id="resultDesc"></p>
+    <div class="result-review" id="reviewList"></div>
+    <button class="btn btn-restart" onclick="restartQuiz()">
+      🔄 Ulangi Kuis
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ====== QUESTION BANK ======
+const questions = [
+  {
+    q: "Apa produk yang harus dibeli petani untuk mengikuti program Oberon Spinwheel?",
+    opts: [
+      "Oberon Speed 200ml",
+      "Oberon 2 SC 500ml",
+      "Oberon Speed 100ml",
+      "Oberon 4 SC 1 liter"
+    ],
+    answer: 0,
+    explain: "Program ini spesifik untuk <strong>Oberon Speed 200ml</strong> — 1 botol cukup untuk lahan ½ hektar. Oberon 2 SC dan 4 SC tidak termasuk dalam program ini."
+  },
+  {
+    q: "Sampai kapan program Oberon Spinwheel berlangsung?",
+    opts: [
+      "31 Agustus 2026",
+      "30 Juni 2026",
+      "31 Juli 2026",
+      "31 Desember 2026"
+    ],
+    answer: 2,
+    explain: "Periode program Oberon Speed Petani adalah <strong>1 Juni – 31 Juli 2026</strong> (info perpanjangan belum ada). Surat resmi: 028/BCS-SLS/26, 11 June 2026."
+  },
+  {
+    q: "Setelah scan QR code, petani harus mengisi data diri lewat platform apa?",
+    opts: [
+      "Website Bayer",
+      "Aplikasi Bayer Go",
+      "TANIA (WhatsApp)",
+      "Google Form"
+    ],
+    answer: 2,
+    explain: "Data diri diisi lewat <strong>TANIA (WhatsApp)</strong> — bukan website atau aplikasi terpisah. Petani juga harus verifikasi OTP dan menyetujui Terms & Conditions sebelum bisa spin."
+  },
+  {
+    q: "Berapa hadiah TERBESAR yang bisa didapat petani dari Oberon Spinwheel?",
+    opts: [
+      "Rp 500.000",
+      "Rp 1.000.000",
+      "Rp 250.000",
+      "Rp 2.500.000"
+    ],
+    answer: 1,
+    explain: "Hadiah tertinggi adalah <strong>Rp 1.000.000</strong>. Total ada 7 denominasi: Rp 10rb, 25rb, 50rb, 100rb, 250rb, 500rb, dan 1jt. Semua hadiah langsung dalam bentuk voucher digital."
+  },
+  {
+    q: "Voucher hadiah Oberon Spinwheel bisa ditukar di mana saja? (Pilih yang PALING TEPAT)",
+    opts: [
+      "Hanya di Alfamart",
+      "Hanya di Indomaret",
+      "Hanya untuk pulsa & PLN",
+      "Alfamart, Indomaret, Pulsa, PLN, & eWallet"
+    ],
+    answer: 3,
+    explain: "Voucher bisa ditukar di <strong>semua channel tersebut</strong>: Alfamart, Indomaret, Pulsa, PLN, dan eWallet. Fleksibilitas penukaran jadi nilai jual program ke petani."
+  },
+  {
+    q: "Siapa caretaker (penanggung jawab) program Oberon Spinwheel dari Bayer?",
+    opts: [
+      "Bang Irham (TM Semarang)",
+      "Agung Hery (Commercial Excellence)",
+      "Pak Samuel (BPM Insektisida)",
+      "DR Petani masing-masing area"
+    ],
+    answer: 2,
+    explain: "Program ini di-handle oleh <strong>Pak Samuel dari BPM Insektisida</strong>. Agung Hery = Commercial Excellence (urusan program kios, BUKAN program ini). DR Petani = eksekutor lapangan, bukan caretaker."
+  },
+  {
+    q: "Program Oberon Spinwheel mencakup area mana?",
+    opts: [
+      "Hanya Jawa Tengah",
+      "Hanya area TM Semarang (Demak, Grobogan, Kudus, Semarang)",
+      "Nasional (seluruh Indonesia)",
+      "Hanya Pulau Jawa"
+    ],
+    answer: 2,
+    explain: "Program ini berskala <strong>Nasional</strong> — seluruh Indonesia. Semua petani yang membeli Oberon Speed 200ml di kios bisa ikut. TM Semarang adalah salah satu area eksekusi."
+  },
+  {
+    q: "1 botol Oberon Speed 200ml cukup untuk lahan seluas?",
+    opts: [
+      "1 hektar",
+      "¼ hektar",
+      "½ hektar",
+      "2 hektar"
+    ],
+    answer: 2,
+    explain: "1 botol Oberon Speed 200ml cukup untuk <strong>½ hektar</strong>. Info ini penting disampaikan ke petani agar tidak under-dose atau over-dose."
+  },
+  {
+    q: "Siapa yang mendistribusikan kupon/voucher QR Code Oberon Spinwheel ke kios?",
+    opts: [
+      "DR Petani",
+      "DR Kios (Beni, Safii, Resa)",
+      "Tim Marketing Bayer",
+      "Distributor (DMR)"
+    ],
+    answer: 2,
+    explain: "Kupon/voucher QR Code didistribusikan oleh <strong>Tim Marketing Bayer</strong>. Bang Irham akan menginfokan ke DR saat kupon sudah dibagi. DR bertugas memastikan kios punya stok dan kupon tersedia."
+  },
+  {
+    q: "Program Oberon Spinwheel diintegrasikan dengan inisiatif strategis apa di area Bang Irham?",
+    opts: [
+      "Better Life Farming (BLF)",
+      "Program R2 Food Force",
+      "KC Hijau MT3",
+      "Agri Warriors"
+    ],
+    answer: 2,
+    explain: "Oberon Spinwheel diintegrasikan dengan <strong>KC Hijau MT3</strong> — strategi lintas-DR untuk tanaman kacang hijau. Timing: spin wheel aktif Juni-Juli, tanam KC Hijau Juli, Oberon spray H+15/H+22. Demo = buktiin efektivitas. Spin = bonus langsung."
+  }
+];
+
+// ====== STATE ======
+let currentQ = 0;
+let score = 0;
+let answers = [];
+let timerInterval = null;
+let timeLeft = 20;
+let answered = false;
+
+// ====== START ======
+function startQuiz() {
+  currentQ = 0;
+  score = 0;
+  answers = [];
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  showQuestion();
+}
+
+// ====== SHOW QUESTION ======
+function showQuestion() {
+  answered = false;
+  timeLeft = 20;
+  const q = questions[currentQ];
+  
+  document.getElementById('progress').textContent = `${currentQ + 1}/10`;
+  document.getElementById('qNum').textContent = `PERTANYAAN ${currentQ + 1}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('timer').textContent = `⏱ ${timeLeft}`;
+  document.getElementById('timer').className = 'quiz-timer';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('btnNext').classList.remove('show');
+  
+  const optsDiv = document.getElementById('options');
+  optsDiv.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optsDiv.appendChild(btn);
+  });
+  
+  startTimer();
+}
+
+// ====== TIMER ======
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 20;
+  document.getElementById('timer').textContent = `⏱ ${timeLeft}`;
+  document.getElementById('timer').className = 'quiz-timer';
+  
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = `⏱ ${timeLeft}`;
+    
+    if (timeLeft <= 5) {
+      document.getElementById('timer').className = 'quiz-timer danger';
+    } else if (timeLeft <= 10) {
+      document.getElementById('timer').className = 'quiz-timer warning';
+    }
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function timeUp() {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+  
+  const q = questions[currentQ];
+  const options = document.querySelectorAll('.option');
+  options.forEach(o => o.disabled = true);
+  options[q.answer].classList.add('correct');
+  
+  answers.push({ q: currentQ, correct: false, userAnswer: -1 });
+  
+  showFeedback(false);
+}
+
+// ====== SELECT ANSWER ======
+function selectAnswer(index) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+  
+  const q = questions[currentQ];
+  const correct = index === q.answer;
+  const options = document.querySelectorAll('.option');
+  
+  options.forEach(o => o.disabled = true);
+  options[q.answer].classList.add('correct');
+  
+  if (correct) {
+    score++;
+    options[index].classList.add('correct');
+  } else {
+    options[index].classList.add('wrong');
+  }
+  
+  answers.push({ q: currentQ, correct, userAnswer: index });
+  showFeedback(correct);
+}
+
+// ====== FEEDBACK ======
+function showFeedback(correct) {
+  const q = questions[currentQ];
+  const fb = document.getElementById('feedback');
+  const fbTitle = document.getElementById('fbTitle');
+  const fbText = document.getElementById('fbText');
+  
+  fb.style.display = 'block';
+  
+  if (correct) {
+    fb.className = 'feedback correct-fb';
+    fbTitle.textContent = '✅ Benar!';
+  } else {
+    fb.className = 'feedback wrong-fb';
+    fbTitle.textContent = timeLeft <= 0 ? '⏰ Waktu Habis!' : '❌ Kurang Tepat';
+  }
+  
+  fbText.innerHTML = q.explain;
+  document.getElementById('btnNext').classList.add('show');
+  document.getElementById('btnNext').textContent = currentQ < 9 ? 'Lanjut →' : 'Lihat Hasil 🏁';
+  document.getElementById('btnNext').focus();
+}
+
+// ====== NEXT ======
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= 10) {
+    showResult();
+  } else {
+    showQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ====== RESULT ======
+function showResult() {
+  clearInterval(timerInterval);
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  
+  document.getElementById('scoreNum').textContent = score;
+  
+  const pct = score / 10;
+  let title, desc;
+  if (pct >= 0.9) { title = 'Luar Biasa! 🌟'; desc = 'Kamu paham banget program Oberon Spinwheel. Siap eksekusi!'; }
+  else if (pct >= 0.7) { title = 'Bagus! 👍'; desc = 'Pemahamanmu cukup baik. Review bagian yang salah ya.'; }
+  else if (pct >= 0.5) { title = 'Lumayan 📖'; desc = 'Masih ada beberapa poin penting yang perlu dipelajari.'; }
+  else { title = 'Perlu Belajar Lagi 💪'; desc = 'Yuk pelajari ulang mekanisme program — terutama alur TANIA dan hadiah.'; }
+  
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultDesc').textContent = desc;
+  
+  const reviewDiv = document.getElementById('reviewList');
+  reviewDiv.innerHTML = '<h3>📋 Review Jawaban</h3>';
+  
+  answers.forEach(a => {
+    const q = questions[a.q];
+    const icon = a.correct ? '✅' : '❌';
+    const cls = a.correct ? 'r-correct' : 'r-wrong';
+    const div = document.createElement('div');
+    div.className = `review-item ${cls}`;
+    div.innerHTML = `<div class="review-q">${icon} Q${a.q + 1}: ${q.q}</div>
+                     <div class="review-a">Jawaban benar: <strong>${q.opts[q.answer]}</strong></div>`;
+    reviewDiv.appendChild(div);
+  });
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ====== RESTART ======
+function restartQuiz() {
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('intro').style.display = 'block';
+  currentQ = 0;
+  score = 0;
+  answers = [];
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
