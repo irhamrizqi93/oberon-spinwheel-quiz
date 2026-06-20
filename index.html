@@ -526,7 +526,16 @@ async function submitResults() {
   status.className = 'submit-status';
 
   try {
-    const res = await fetch('https://85c8fe5765793d.lhr.life/submit', {
+    // Fetch backend URL dari config (auto-update oleh watchdog)
+    let backendUrl = 'https://85c8fe5765793d.lhr.life'; // fallback
+    try {
+      const cfg = await fetch('backend.json');
+      if (cfg.ok) {
+        const data = await cfg.json();
+        backendUrl = data.backend_url;
+      }
+    } catch(e) { /* pakai fallback */ }
+    const res = await fetch(backendUrl + '/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
