@@ -1,0 +1,162 @@
+[
+  {
+    "nama": "Darmanto",
+    "timestamp": "2026-06-21 14:33:53 WIB",
+    "score": 8,
+    "total": 10,
+    "confidence": 0,
+    "pertanyaan": "",
+    "answers": [
+      {
+        "q": 0,
+        "question": "Produk mana yang HARUS dibeli petani untuk bisa mengikuti program Oberon Spinwheel?",
+        "correct": true,
+        "userAnswer": "Oberon Speed 200ml",
+        "correctAnswer": "Oberon Speed 200ml"
+      },
+      {
+        "q": 1,
+        "question": "Sampai kapan program Oberon Spinwheel berlangsung?",
+        "correct": true,
+        "userAnswer": "31 Juli 2026",
+        "correctAnswer": "31 Juli 2026"
+      },
+      {
+        "q": 2,
+        "question": "Setelah scan QR code, petani harus mengisi data diri lewat platform apa?",
+        "correct": false,
+        "userAnswer": "Google Form",
+        "correctAnswer": "TANIA (WhatsApp)"
+      },
+      {
+        "q": 3,
+        "question": "Berapa hadiah TERBESAR yang bisa didapat petani dari Oberon Spinwheel?",
+        "correct": true,
+        "userAnswer": "Rp 1.000.000",
+        "correctAnswer": "Rp 1.000.000"
+      },
+      {
+        "q": 4,
+        "question": "Voucher hadiah Oberon Spinwheel bisa ditukar di mana saja? (Pilih yang PALING TEPAT)",
+        "correct": true,
+        "userAnswer": "Alfamart, Indomaret, Pulsa, PLN, & eWallet",
+        "correctAnswer": "Alfamart, Indomaret, Pulsa, PLN, & eWallet"
+      },
+      {
+        "q": 5,
+        "question": "Oberon Speed efektif mengendalikan hama apa pada tanaman?",
+        "correct": true,
+        "userAnswer": "Kutu kebul (whitefly) dan tungau (mites)",
+        "correctAnswer": "Kutu kebul (whitefly) dan tungau (mites)"
+      },
+      {
+        "q": 6,
+        "question": "Apa keunggulan utama Oberon Speed dibandingkan insektisida biasa?",
+        "correct": true,
+        "userAnswer": "Bisa membunuh SEMUA stadia hama (telur, nimfa, dewasa) + residual panjang",
+        "correctAnswer": "Bisa membunuh SEMUA stadia hama (telur, nimfa, dewasa) + residual panjang"
+      },
+      {
+        "q": 7,
+        "question": "1 botol Oberon Speed 200ml cukup untuk lahan seluas?",
+        "correct": true,
+        "userAnswer": "½ hektar",
+        "correctAnswer": "½ hektar"
+      },
+      {
+        "q": 8,
+        "question": "Pada tanaman kacang hijau, kapan waktu aplikasi Oberon Speed yang direkomendasikan?",
+        "correct": false,
+        "userAnswer": "Kapan saja, tidak ada aturan khusus",
+        "correctAnswer": "H+15 dan H+22 setelah tanam"
+      },
+      {
+        "q": 9,
+        "question": "Apa yang terjadi kalau petani membeli Oberon Speed 200ml tapi TIDAK scan QR code?",
+        "correct": true,
+        "userAnswer": "Tidak bisa ikut spinwheel & tidak dapat hadiah",
+        "correctAnswer": "Tidak bisa ikut spinwheel & tidak dapat hadiah"
+      }
+    ]
+  },
+  {
+    "nama": "Heppy fahroni",
+    "timestamp": "2026-06-21 15:02:59 WIB",
+    "score": 8,
+    "total": 10,
+    "confidence": 5,
+    "pertanyaan": "- 1 botol isi 100ml buat ¼ha bukan ½ha\n- Waktu aplikasi patokan minimal ketika mulai keluar pupus daun 2 bukan umur,karena beda varietas beda muncul 2 daunya,jadi aplikasi sedini mungkin juga tidak apa2.",
+    "answers": [
+      {
+        "q": 0,
+        "question": "Produk mana yang HARUS dibeli petani untuk bisa mengikuti program Oberon Spinwheel?",
+        "correct": true,
+        "userAnswer": "Oberon Speed 200ml",
+        "correctAnswer": "Oberon Speed 200ml"
+      },
+      {
+        "q": 1,
+        "question": "Sampai kapan program Oberon Spinwheel berlangsung?",
+        "correct": true,
+        "userAnswer": "31 Juli 2026",
+        "correctAnswer": "31 Juli 2026"
+      },
+      {
+        "q": 2,
+        "question": "Setelah scan QR code, petani harus mengisi data diri lewat platform apa?",
+        "correct": true,
+        "userAnswer": "TANIA (WhatsApp)",
+        "correctAnswer": "TANIA (WhatsApp)"
+      },
+      {
+        "q": 3,
+        "question": "Berapa hadiah TERBESAR yang bisa didapat petani dari Oberon Spinwheel?",
+        "correct": true,
+        "userAnswer": "Rp 1.000.000",
+        "correctAnswer": "Rp 1.000.000"
+      },
+      {
+        "q": 4,
+        "question": "Voucher hadiah Oberon Spinwheel bisa ditukar di mana saja? (Pilih yang PALING TEPAT)",
+        "correct": true,
+        "userAnswer": "Alfamart, Indomaret, Pulsa, PLN, & eWallet",
+        "correctAnswer": "Alfamart, Indomaret, Pulsa, PLN, & eWallet"
+      },
+      {
+        "q": 5,
+        "question": "Oberon Speed efektif mengendalikan hama apa pada tanaman?",
+        "correct": true,
+        "userAnswer": "Kutu kebul (whitefly) dan tungau (mites)",
+        "correctAnswer": "Kutu kebul (whitefly) dan tungau (mites)"
+      },
+      {
+        "q": 6,
+        "question": "Apa keunggulan utama Oberon Speed dibandingkan insektisida biasa?",
+        "correct": true,
+        "userAnswer": "Bisa membunuh SEMUA stadia hama (telur, nimfa, dewasa) + residual panjang",
+        "correctAnswer": "Bisa membunuh SEMUA stadia hama (telur, nimfa, dewasa) + residual panjang"
+      },
+      {
+        "q": 7,
+        "question": "1 botol Oberon Speed 200ml cukup untuk lahan seluas?",
+        "correct": false,
+        "userAnswer": "¼ hektar",
+        "correctAnswer": "½ hektar"
+      },
+      {
+        "q": 8,
+        "question": "Pada tanaman kacang hijau, kapan waktu aplikasi Oberon Speed yang direkomendasikan?",
+        "correct": false,
+        "userAnswer": "Saat tanam (H+0)",
+        "correctAnswer": "H+15 dan H+22 setelah tanam"
+      },
+      {
+        "q": 9,
+        "question": "Apa yang terjadi kalau petani membeli Oberon Speed 200ml tapi TIDAK scan QR code?",
+        "correct": true,
+        "userAnswer": "Tidak bisa ikut spinwheel & tidak dapat hadiah",
+        "correctAnswer": "Tidak bisa ikut spinwheel & tidak dapat hadiah"
+      }
+    ]
+  }
+]

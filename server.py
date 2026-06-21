@@ -62,7 +62,7 @@ class QuizHandler(http.server.BaseHTTPRequestHandler):
                 "nama": data.get("nama", "Tanpa Nama"),
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S WIB"),
                 "score": data.get("score", 0),
-                "total": data.get("total", 13),
+                "total": data.get("total", 10),
                 "confidence": data.get("confidence", 0),
                 "pertanyaan": data.get("pertanyaan", ""),
                 "answers": data.get("answers", []),
