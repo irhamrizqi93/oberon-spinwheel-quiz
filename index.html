@@ -356,6 +356,39 @@ const questions = [
     ],
     answer: 2,
     explain: "Tanpa scan QR code dan isi data via TANIA, petani <strong>TIDAK bisa ikut spinwheel dan TIDAK dapat hadiah</strong>. DR harus pastikan setiap petani yang beli langsung scan di tempat — jangan ditunda!"
+  },
+  {
+    q: "Berapa ukuran kemasan botol Oberon Speed yang tersedia di pasaran?",
+    opts: [
+      "100ml dan 200ml",
+      "Hanya 200ml/botol",
+      "Hanya 100ml/botol",
+      "50ml, 100ml, dan 200ml"
+    ],
+    answer: 1,
+    explain: "Oberon Speed <strong>hanya tersedia dalam 1 kemasan: 200ml/botol</strong>. Tidak ada kemasan 100ml! Jadi 1 botol = 200ml. Jangan sampai salah sebut ke petani."
+  },
+  {
+    q: "Jika dosis rekomendasi Vayego adalah 200ml/ha, berapa botol yang dibutuhkan untuk 1 hektar lahan?",
+    opts: [
+      "1 botol Vayego 200ml",
+      "2 botol Vayego 100ml atau 4 botol Vayego 50ml",
+      "1 botol Vayego 100ml",
+      "Tergantung luas lahan"
+    ],
+    answer: 1,
+    explain: "Vayego tersedia dalam kemasan <strong>100ml dan 50ml</strong> (tidak ada 200ml). Dosis 200ml/ha = <strong>2 botol 100ml</strong> atau <strong>4 botol 50ml</strong>. Selalu konversi berdasarkan kemasan yang benar-benar ada!"
+  },
+  {
+    q: "Mana aturan yang BENAR tentang dosis dan kemasan produk Bayer?",
+    opts: [
+      "Dosis bisa di-repack per ml, kelebihan bisa dipakai area lain",
+      "Harus dibulatkan ke botol utuh — tidak bisa repack/transfer antar area DR berbeda",
+      "Petani boleh beli setengah botol kalau dosis cuma butuh 100ml",
+      "Semua kemasan produk Bayer ukurannya 100ml"
+    ],
+    answer: 1,
+    explain: "Aturan main: <strong>harus dibulatkan ke botol utuh</strong>. Butuh 50ml? Beli 1 botol (sisa hangus). Butuh 110ml? Beli 2 botol. <strong>TIDAK bisa repack/transfer antar area DR berbeda</strong> — ini aturan baku Bayer."
   }
 ];
 
@@ -508,7 +541,7 @@ async function submitResults() {
   const payload = {
     nama: playerName,
     score: score,
-    total: 10,
+    total: questions.length,
     confidence: confidence,
     pertanyaan: document.getElementById('freeQuestion').value.trim(),
     answers: answers.map(a => ({
