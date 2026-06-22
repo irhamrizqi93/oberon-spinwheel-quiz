@@ -3,157 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Oberon Spinwheel Quiz</title>
+<title>Oberon Spinwheel Quiz — DR Edition</title>
 <style>
   :root {
-    --green: #1B8A3D; --green-dark: #0F5C28; --green-light: #E8F5E9;
-    --gold: #F5A623; --white: #FFF; --gray: #F5F5F5;
-    --gray-dark: #666; --red: #E53935; --correct: #2E7D32; --wrong: #C62828;
-    --text: #333; --star: #FFB300;
+    --bayer: #10384F; --bayer-light: #1A5C7A;
+    --green: #00A86B; --green-dark: #007A4D; --green-glow: #00D68F;
+    --gold: #F5A623; --gold-light: #FFD54F; --gold-dark: #D4890A;
+    --white: #FFF; --bg: #F0F7F4;
+    --card: #FFF; --text: #1A2332; --muted: #6B7C93;
+    --red: #E53935; --red-light: #FFEBEE;
+    --correct: #00A86B; --wrong: #E53935;
+    --star: #FFB300; --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+    --radius: 20px; --radius-sm: 14px;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 50%, #A5D6A7 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: radial-gradient(ellipse at 20% 50%, #E8F5F0 0%, #D4EDE3 30%, #C5DFD3 100%);
     min-height: 100dvh; display:flex; align-items:center; justify-content:center;
     padding:16px; -webkit-tap-highlight-color:transparent;
   }
+
+  /* floating bg elements */
+  body::before {
+    content:''; position:fixed; top:-120px; right:-80px;
+    width:300px; height:300px; border-radius:50%;
+    background:radial-gradient(circle, rgba(0,168,107,0.08) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+  body::after {
+    content:''; position:fixed; bottom:-100px; left:-60px;
+    width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+
   .container {
-    width:100%; max-width:480px; background:var(--white);
-    border-radius:24px; box-shadow:0 8px 40px rgba(0,0,0,0.12);
-    overflow:hidden; position:relative;
+    width:100%; max-width:460px; background:var(--card);
+    border-radius:24px; box-shadow:var(--shadow-lg);
+    overflow:hidden; position:relative; z-index:1;
   }
 
-  /* INTRO */
+  /* shared */
   .screen { display:none; }
-  .screen.active { display:block; }
+  .screen.active { display:block; animation: slideUp 0.35s ease; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes popIn { 0%{transform:scale(0.8);opacity:0} 60%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+  @keyframes confettiDrop { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(80px) rotate(360deg);opacity:0} }
 
-  .intro { padding:40px 24px; text-align:center; }
+  /* ── INTRO ── */
+  .intro { padding:44px 28px 36px; text-align:center; position:relative; }
+  .intro-topbar {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-bottom:8px;
+  }
+  .intro-badge {
+    background:linear-gradient(135deg, var(--green), #008F5A);
+    color:white; font-size:10px; font-weight:700; letter-spacing:1.2px;
+    padding:5px 14px; border-radius:20px; text-transform:uppercase;
+  }
   .intro-logo {
-    width:80px; height:80px; margin:0 auto 16px;
-    background: linear-gradient(135deg, var(--green), var(--green-dark));
-    border-radius:20px; display:flex; align-items:center; justify-content:center;
-    font-size:36px; color:white; box-shadow:0 4px 20px rgba(27,138,61,0.3);
+    width:90px; height:90px; margin:0 auto 20px;
+    background:linear-gradient(145deg, #00C97A, var(--green), var(--green-dark));
+    border-radius:24px; display:flex; align-items:center; justify-content:center;
+    font-size:44px; color:white;
+    box-shadow:0 8px 32px rgba(0,168,107,0.35);
+    position:relative; animation: float 3s ease-in-out infinite;
   }
-  .intro h1 { font-size:22px; color:var(--green-dark); margin-bottom:6px; font-weight:800; }
-  .intro .subtitle { font-size:13px; color:var(--gray-dark); margin-bottom:24px; line-height:1.5; }
-  .intro .meta { display:flex; gap:10px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
-  .intro .meta-chip {
-    background:var(--green-light); color:var(--green-dark);
-    padding:5px 12px; border-radius:16px; font-size:11px; font-weight:600;
+  .intro-logo::after {
+    content:''; position:absolute; inset:-4px; border-radius:28px;
+    border:2px dashed rgba(255,255,255,0.3); animation: pulse 2.5s ease-in-out infinite;
   }
+  .intro h1 {
+    font-size:24px; font-weight:800; color:var(--bayer);
+    margin-bottom:4px; letter-spacing:-0.5px;
+  }
+  .intro .subtitle {
+    font-size:13px; color:var(--muted); margin-bottom:24px; line-height:1.6;
+  }
+  .intro .subtitle strong { color:var(--green-dark); }
+  .meta-row { display:flex; gap:8px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
+  .meta-chip {
+    background:linear-gradient(135deg, #E8F5F0, #D4EDE3);
+    color:var(--green-dark); padding:6px 14px; border-radius:20px;
+    font-size:11px; font-weight:700; white-space:nowrap;
+  }
+  .meta-chip.gold { background:linear-gradient(135deg, #FFF8E1, #FFECB3); color:var(--gold-dark); }
 
-  /* NAME INPUT */
-  .name-section { margin:16px 0; text-align:left; }
-  .name-section label { display:block; font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .name-section { margin:0 0 4px; text-align:left; }
+  .name-section label { display:block; font-size:13px; font-weight:700; color:var(--text); margin-bottom:8px; }
   .name-input {
-    width:100%; padding:12px 16px; border:2px solid #E0E0E0; border-radius:12px;
-    font-size:16px; outline:none; transition:border 0.2s; -webkit-appearance:none;
+    width:100%; padding:14px 18px; border:2px solid #DCE5E0; border-radius:var(--radius-sm);
+    font-size:16px; outline:none; transition:all 0.2s; background:#F9FBFA;
+    -webkit-appearance:none; font-family:inherit;
   }
-  .name-input:focus { border-color:var(--green); }
-  .name-error { color:var(--red); font-size:12px; margin-top:4px; display:none; }
+  .name-input:focus { border-color:var(--green); background:white; box-shadow:0 0 0 4px rgba(0,168,107,0.1); }
+  .name-error { color:var(--red); font-size:12px; margin-top:6px; display:none; }
 
   .btn {
-    display:inline-block; padding:14px 48px; border:none; border-radius:14px;
-    font-size:16px; font-weight:700; cursor:pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
+    display:inline-block; padding:15px 48px; border:none; border-radius:var(--radius-sm);
+    font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;
+    transition: transform 0.12s, box-shadow 0.12s;
     -webkit-appearance:none; touch-action:manipulation;
   }
-  .btn:active { transform:scale(0.96); }
+  .btn:active { transform:scale(0.97); }
   .btn-start {
-    background: linear-gradient(135deg, var(--green), var(--green-dark));
-    color:white; box-shadow:0 4px 16px rgba(27,138,61,0.35); font-size:18px;
-    margin-top:12px; width:100%;
+    background:linear-gradient(135deg, var(--green), var(--green-dark));
+    color:white; box-shadow:0 6px 24px rgba(0,168,107,0.3);
+    font-size:18px; margin-top:16px; width:100%; position:relative; overflow:hidden;
+  }
+  .btn-start::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    background-size:200% 100%; animation: shimmer 2.5s infinite;
   }
   .btn-start:disabled { opacity:0.5; pointer-events:none; }
+  .btn-start:disabled::after { animation:none; }
 
-  /* QUIZ */
+  /* ── QUIZ ── */
   .quiz-header {
-    padding:14px 20px; display:flex; align-items:center; justify-content:space-between;
-    border-bottom:1px solid #E0E0E0; background:white;
+    padding:16px 22px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid #E8EDEA; background:white;
     position:sticky; top:0; z-index:10;
   }
-  .quiz-progress { font-size:13px; color:var(--gray-dark); font-weight:600; }
-  .quiz-timer { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:700; color:var(--green-dark); }
-  
-  @keyframes pulse { from{transform:scale(1)} to{transform:scale(1.15)} }
+  .progress-bar-wrap {
+    flex:1; height:6px; background:#E8EDEA; border-radius:10px;
+    overflow:hidden; margin-right:16px;
+  }
+  .progress-bar-fill {
+    height:100%; background:linear-gradient(90deg, var(--green), var(--green-glow));
+    border-radius:10px; transition:width 0.4s ease;
+  }
+  .quiz-step { font-size:12px; color:var(--muted); font-weight:700; white-space:nowrap; }
 
-  .quiz-body { padding:24px 20px; }
-  .question-num { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--green); font-weight:700; margin-bottom:8px; }
-  .question-text { font-size:17px; font-weight:700; color:var(--text); line-height:1.5; margin-bottom:20px; }
+  .quiz-body { padding:28px 22px; }
+  .q-tag { display:inline-block; font-size:10px; text-transform:uppercase; letter-spacing:1.8px;
+    font-weight:800; padding:4px 10px; border-radius:8px; margin-bottom:14px; }
+  .q-tag.knowledge { background:#E3F2FD; color:#1565C0; }
+  .q-tag.skill { background:#FFF3E0; color:#E65100; }
+  .q-tag.product { background:#E8F5E9; color:#2E7D32; }
+
+  .question-text { font-size:17px; font-weight:700; color:var(--text); line-height:1.55; margin-bottom:22px; }
   .options { display:flex; flex-direction:column; gap:10px; }
   .option {
-    padding:14px 18px; border:2px solid #E0E0E0; border-radius:14px;
-    font-size:15px; font-weight:500; color:var(--text); background:white;
-    cursor:pointer; transition:all 0.15s; text-align:left;
-    -webkit-appearance:none; touch-action:manipulation;
+    padding:15px 18px; border:2px solid #E5EAE7; border-radius:var(--radius-sm);
+    font-size:14.5px; font-weight:500; color:var(--text); background:#FAFCFB;
+    cursor:pointer; transition:all 0.18s; text-align:left; line-height:1.4;
+    -webkit-appearance:none; touch-action:manipulation; font-family:inherit;
+    position:relative; overflow:hidden;
   }
-  .option:active { transform:scale(0.98); }
-  .option:hover { border-color:var(--green); background:var(--green-light); }
-  .option.correct { border-color:var(--correct)!important; background:#E8F5E9!important; color:var(--correct)!important; }
-  .option.wrong { border-color:var(--wrong)!important; background:#FFEBEE!important; color:var(--wrong)!important; }
+  .option::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:transparent; border-radius:0 4px 4px 0; transition:background 0.18s;
+  }
+  .option:hover { border-color:var(--green); background:white; box-shadow:0 2px 12px rgba(0,168,107,0.08); }
+  .option:hover::before { background:var(--green); }
+  .option.correct { border-color:var(--correct)!important; background:#E8F5E9!important; }
+  .option.correct::before { background:var(--correct)!important; }
+  .option.wrong { border-color:var(--wrong)!important; background:var(--red-light)!important; }
+  .option.wrong::before { background:var(--wrong)!important; }
   .option:disabled { pointer-events:none; }
 
-  .feedback { margin-top:16px; padding:16px; border-radius:14px; display:none; animation:fadeIn 0.3s; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .feedback.correct-fb { background:#E8F5E9; border:1px solid #A5D6A7; display:block; }
-  .feedback.wrong-fb { background:#FFEBEE; border:1px solid #EF9A9A; display:block; }
-  .feedback-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+  .feedback { margin-top:18px; padding:18px; border-radius:var(--radius-sm); display:none; animation:slideUp 0.3s; }
+  .feedback.correct-fb { background:#E8F5E9; border:1px solid #B9DFC4; display:block; }
+  .feedback.wrong-fb { background:var(--red-light); border:1px solid #F5CDCD; display:block; }
+  .fb-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .fb-icon { font-size:22px; }
+  .feedback-title { font-size:15px; font-weight:700; }
   .feedback.correct-fb .feedback-title { color:var(--correct); }
   .feedback.wrong-fb .feedback-title { color:var(--wrong); }
-  .feedback-text { font-size:13px; color:var(--text); line-height:1.6; }
-  .btn-next { margin-top:16px; width:100%; background:var(--green); color:white; font-size:15px; display:none; }
-  .btn-next.show { display:block; }
+  .feedback-text { font-size:13px; color:#455A64; line-height:1.65; }
+  .btn-next { margin-top:20px; width:100%; background:var(--green); color:white; font-size:15px; display:none; }
+  .btn-next.show { display:block; animation:slideUp 0.3s; }
 
-  /* RESULT */
-  .result { padding:28px 24px; text-align:center; }
-  .result-score {
-    width:110px; height:110px; border-radius:50%;
-    background:linear-gradient(135deg,var(--green),var(--green-dark));
-    display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
-    box-shadow:0 6px 28px rgba(27,138,61,0.3); flex-direction:column;
+  /* ── RESULT ── */
+  .result { padding:32px 24px 28px; text-align:center; }
+  .confetti-row { display:flex; justify-content:center; gap:8px; margin-bottom:-8px; height:50px; overflow:hidden; }
+  .confetti {
+    font-size:22px; animation: confettiDrop 1.8s ease-out forwards;
+    opacity:0; animation-delay:var(--d);
   }
-  .result-score .score-num { font-size:34px; font-weight:900; color:white; line-height:1; }
-  .result-score .score-label { font-size:11px; color:rgba(255,255,255,0.8); margin-top:2px; }
-  .result h2 { font-size:20px; color:var(--green-dark); margin-bottom:4px; }
-  .result .result-desc { font-size:13px; color:var(--gray-dark); margin-bottom:20px; }
+  .result-score {
+    width:120px; height:120px; border-radius:50%;
+    background:linear-gradient(145deg, var(--green), var(--green-dark));
+    display:flex; align-items:center; justify-content:center; margin:0 auto 20px;
+    box-shadow:0 8px 36px rgba(0,168,107,0.35); flex-direction:column;
+    animation: popIn 0.5s ease;
+  }
+  .result-score .score-num { font-size:40px; font-weight:900; color:white; line-height:1; }
+  .result-score .score-label { font-size:11px; color:rgba(255,255,255,0.75); margin-top:3px; letter-spacing:1px; }
+  .result h2 { font-size:21px; color:var(--bayer); margin-bottom:4px; font-weight:800; }
+  .result .result-desc { font-size:13px; color:var(--muted); margin-bottom:8px; }
 
-  /* STAR RATING */
+  /* breakdown */
+  .breakdown { display:flex; gap:10px; justify-content:center; margin-bottom:22px; flex-wrap:wrap; }
+  .break-chip { padding:8px 14px; border-radius:12px; font-size:12px; font-weight:700; line-height:1.3; }
+  .break-chip.know { background:#E3F2FD; color:#0D47A1; }
+  .break-chip.skill { background:#FFF3E0; color:#BF360C; }
+
+  /* stars */
   .star-section { margin-bottom:20px; }
   .star-section p { font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; }
   .stars { display:flex; gap:6px; justify-content:center; }
   .star {
-    font-size:32px; cursor:pointer; filter:grayscale(1); opacity:0.35;
+    font-size:34px; cursor:pointer; filter:grayscale(1); opacity:0.3;
     transition:transform 0.15s, filter 0.15s, opacity 0.15s; user-select:none;
   }
   .star.active { filter:grayscale(0); opacity:1; }
-  .star:active { transform:scale(1.2); }
+  .star:active { transform:scale(1.25); }
 
-  /* QUESTION BOX */
-  .question-box { margin-bottom:20px; text-align:left; }
-  .question-box label { display:block; font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .question-box { margin-bottom:22px; text-align:left; }
+  .question-box label { display:block; font-size:13px; font-weight:700; color:var(--text); margin-bottom:8px; }
   .question-box textarea {
-    width:100%; padding:12px; border:2px solid #E0E0E0; border-radius:12px;
-    font-size:14px; font-family:inherit; resize:vertical; min-height:60px;
-    outline:none; -webkit-appearance:none;
+    width:100%; padding:14px; border:2px solid #E5EAE7; border-radius:var(--radius-sm);
+    font-size:14px; font-family:inherit; resize:vertical; min-height:64px;
+    outline:none; background:#FAFCFB; -webkit-appearance:none;
   }
-  .question-box textarea:focus { border-color:var(--green); }
+  .question-box textarea:focus { border-color:var(--green); background:white; }
 
-  /* REVIEW */
   .result-review { text-align:left; margin-bottom:20px; }
-  .result-review h3 { font-size:15px; color:var(--text); margin-bottom:10px; }
-  .review-item { padding:10px 12px; border-radius:10px; margin-bottom:6px; font-size:12px; line-height:1.5; border-left:4px solid transparent; }
-  .review-item.r-correct { background:#F1F8E9; border-left-color:var(--correct); color:#1B5E20; }
-  .review-item.r-wrong { background:#FFF3F0; border-left-color:var(--wrong); color:#B71C1C; }
-  .review-q { font-weight:700; margin-bottom:2px; }
-  .review-a { font-size:11px; opacity:0.85; }
+  .result-review h3 { font-size:14px; color:var(--text); margin-bottom:12px; font-weight:700; }
+  .review-item { padding:12px 14px; border-radius:12px; margin-bottom:8px; font-size:12px; line-height:1.5; border-left:4px solid transparent; }
+  .review-item.r-correct { background:#F1F8E9; border-left-color:var(--correct); }
+  .review-item.r-wrong { background:#FFF3F0; border-left-color:var(--wrong); }
+  .review-q { font-weight:700; margin-bottom:3px; }
+  .review-a { font-size:11px; opacity:0.8; }
 
   .btn-submit {
-    width:100%; background:linear-gradient(135deg,var(--green),var(--green-dark));
-    color:white; font-size:16px; margin-top:8px;
+    width:100%; background:linear-gradient(135deg, var(--green), var(--green-dark));
+    color:white; font-size:16px; margin-top:6px;
+    box-shadow:0 4px 18px rgba(0,168,107,0.25);
   }
   .btn-submit:disabled { opacity:0.5; pointer-events:none; }
-  .submit-status { font-size:13px; margin-top:8px; min-height:20px; }
+  .submit-status { font-size:13px; margin-top:10px; min-height:20px; font-weight:600; }
   .submit-status.success { color:var(--correct); }
   .submit-status.error { color:var(--wrong); }
 </style>
@@ -162,19 +248,20 @@
 
 <div class="container" id="app">
 
-  <!-- ========== SCREEN 1: INTRO + NAME ========== -->
+  <!-- ═══════ SCREEN 1: INTRO ═══════ -->
   <div class="screen active" id="screen-intro">
     <div class="intro">
+      <div class="intro-badge">🏆 DR EDITION</div>
       <div class="intro-logo">🎡</div>
       <h1>Oberon Spinwheel</h1>
       <p class="subtitle">
-        Uji pemahamanmu tentang program<br>
-        <strong>Oberon Speed Petani</strong> — scan, spin, menang!
+        Uji <strong>product knowledge</strong> + <strong>skill jualan</strong> kamu.<br>
+        Bukan sekadar hafalan — ini buat improve performa di lapangan.
       </p>
-      <div class="meta">
-        <span class="meta-chip">10 Pertanyaan</span>
-        <span class="meta-chip">♾ Tanpa batas waktu</span>
-        <span class="meta-chip">📝 +Penjelasan</span>
+      <div class="meta-row">
+        <span class="meta-chip">📚 5 Knowledge</span>
+        <span class="meta-chip gold">🎯 5 Skill DR</span>
+        <span class="meta-chip">♾ No Timer</span>
       </div>
 
       <div class="name-section">
@@ -189,36 +276,41 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 2: QUIZ ========== -->
+  <!-- ═══════ SCREEN 2: QUIZ ═══════ -->
   <div class="screen" id="screen-quiz">
     <div class="quiz-header">
-      <span class="quiz-progress" id="progress">1/10</span>
-      <span class="quiz-timer" id="timer" style="display:none"></span>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:10%"></div></div>
+      <span class="quiz-step" id="progress">1/10</span>
     </div>
     <div class="quiz-body">
-      <div class="question-num" id="qNum">PERTANYAAN 1</div>
+      <span class="q-tag" id="qTag">KNOWLEDGE</span>
       <div class="question-text" id="qText"></div>
       <div class="options" id="options"></div>
       <div class="feedback" id="feedback">
-        <div class="feedback-title" id="fbTitle"></div>
+        <div class="fb-header">
+          <span class="fb-icon" id="fbIcon"></span>
+          <span class="feedback-title" id="fbTitle"></span>
+        </div>
         <div class="feedback-text" id="fbText"></div>
       </div>
       <button class="btn btn-next" id="btnNext" onclick="nextQuestion()">Lanjut →</button>
     </div>
   </div>
 
-  <!-- ========== SCREEN 3: RESULT ========== -->
+  <!-- ═══════ SCREEN 3: RESULT ═══════ -->
   <div class="screen" id="screen-result">
     <div class="result">
+      <div class="confetti-row" id="confettiRow"></div>
       <div class="result-score">
         <span class="score-num" id="scoreNum">0</span>
         <span class="score-label">/ 10</span>
       </div>
       <h2 id="resultTitle"></h2>
       <p class="result-desc" id="resultDesc"></p>
+      <div class="breakdown" id="breakdown"></div>
 
       <div class="star-section">
-        <p>Seberapa percaya diri kamu bisa menjelaskan program ini ke petani?</p>
+        <p>⭐ Seberapa percaya diri kamu bisa eksekusi di lapangan setelah paham materi ini?</p>
         <div class="stars" id="stars">
           <span class="star" onclick="setStars(1)">⭐</span>
           <span class="star" onclick="setStars(2)">⭐</span>
@@ -229,8 +321,8 @@
       </div>
 
       <div class="question-box">
-        <label>❓ Ada pertanyaan tentang program Oberon Spinwheel?</label>
-        <textarea id="freeQuestion" placeholder="Tulis pertanyaanmu di sini (opsional)..." maxlength="500"></textarea>
+        <label>💬 Ada yang masih bingung? Tanya di sini...</label>
+        <textarea id="freeQuestion" placeholder="Misal: Gimana cara jelasin hadiahnya ke petani yang gaptek?" maxlength="500"></textarea>
       </div>
 
       <div class="result-review" id="reviewList"></div>
@@ -245,10 +337,26 @@
 </div>
 
 <script>
-// ====== QUESTION BANK ======
+// ══════════════════════════════════════
+// QUESTION BANK v2 — DR Edition
+// K = Knowledge (produk/program) | S = Skill (jualan/komunikasi)
+// ══════════════════════════════════════
 const questions = [
   {
-    q: "Produk mana yang HARUS dibeli petani untuk bisa mengikuti program Oberon Spinwheel?",
+    type: "skill",
+    q: "Seorang petani bilang: \"Saya cuma tanam ¼ hektar, gak worth it beli Oberon.\" — Apa RESPON terbaik sebagai DR?",
+    opts: [
+      "\"Ya udah, beli yang murah aja Pak.\"",
+      "\"Cocok banget Pak! 1 botol Oberon 100ml cukup untuk ¼ hektar. Investasi Rp X — baliknya bisa berkali lipat dari panen sehat + hadiah spinwheel sampai Rp 1 juta. Saya bantu scan sekarang ya?\"",
+      "\"Udah aturan dari Bayer, harus beli 2 botol.\"",
+      "\"Coba merek lain aja mungkin lebih cocok.\""
+    ],
+    answer: 1,
+    explain: "<strong>Formula DR jago:</strong> Kenali pain point (lahan kecil) → tunjukkan <strong>kesesuaian dosis</strong> (1 botol = ¼ ha) → sebut <strong>value lengkap:</strong> panen sehat + hadiah spinwheel → langsung tawarkan <strong>aksi</strong> (scan sekarang). Petani lahan kecil justru paling diuntungkan karena modal kecil dapat hadiah yang sama besar."
+  },
+  {
+    type: "knowledge",
+    q: "Produk mana yang HARUS dibeli petani untuk ikut program Oberon Spinwheel?",
     opts: [
       "Nativo 50gr",
       "Vayego 100ml",
@@ -256,122 +364,119 @@ const questions = [
       "Belt 200ml"
     ],
     answer: 2,
-    explain: "Program ini spesifik untuk <strong>Oberon Speed 200ml</strong> — bukan Nativo, Vayego, atau Belt. Pastikan petani tahu produk mana yang eligible."
+    explain: "Program ini spesifik untuk <strong>Oberon Speed 200ml</strong>. Jangan sampai DR salah rekomendasi ke petani — Nativo, Vayego, Belt = produk bagus, tapi BUKAN jalur masuk program ini."
   },
   {
-    q: "Sampai kapan program Oberon Spinwheel berlangsung?",
+    type: "skill",
+    q: "Petani sudah beli Oberon tapi menolak scan QR code karena \"ribet\". Kamu harus gimana?",
     opts: [
-      "31 Agustus 2026",
+      "Biarkan saja — yang penting udah beli.",
+      "Paksa petani scan sambil marah.",
+      "Ambil HP petani, scan & isi TANIA sendiri tanpa izin.",
+      "Jelaskan dengan sabar: \"Pak, 2 menit aja — scan, isi data di WA, langsung bisa spin. Kalau nanti aja, takutnya lupa dan hadiahnya hangus. Sini saya bantu sampai selesai.\""
+    ],
+    answer: 3,
+    explain: "<strong>Scan = kunci KPI kita.</strong> Tanpa scan, petani tidak dapat hadiah, dan data tidak masuk BRP. DR wajib <strong>bantu langsung di tempat</strong> — jangan andalkan petani scan sendiri. Jadikan bagian dari service, bukan beban. Pastikan HP petani ada kuota & kamera berfungsi."
+  },
+  {
+    type: "knowledge",
+    q: "Periode program Oberon Speed Petani berlangsung sampai kapan?",
+    opts: [
       "30 Juni 2026",
       "31 Juli 2026",
+      "31 Agustus 2026",
       "31 Desember 2026"
     ],
-    answer: 2,
-    explain: "Periode program Oberon Speed Petani adalah <strong>1 Juni – 31 Juli 2026</strong> (info perpanjangan belum ada). Surat resmi: 028/BCS-SLS/26, 11 June 2026."
+    answer: 1,
+    explain: "Periode resmi: <strong>1 Juni – 31 Juli 2026</strong>. Gunakan urgency ini: \"Pak, programnya tinggal sampai akhir Juli — buruan sebelum kehabisan periode.\" Jangan janjikan perpanjangan kalau belum ada surat resmi baru. Surat: 028/BCS-SLS/26, 11 June 2026."
   },
   {
-    q: "Setelah scan QR code, petani harus mengisi data diri lewat platform apa?",
+    type: "skill",
+    q: "Saat jelasin Oberon ke petani, apa LEADING STATEMENT terbaik yang langsung bikin petani penasaran?",
     opts: [
-      "Website Bayer",
-      "Aplikasi Bayer Go",
-      "TANIA (WhatsApp)",
-      "Google Form"
-    ],
-    answer: 2,
-    explain: "Data diri diisi lewat <strong>TANIA (WhatsApp)</strong> — bukan website atau aplikasi terpisah. Petani juga harus verifikasi OTP dan menyetujui Terms & Conditions sebelum bisa spin."
-  },
-  {
-    q: "Berapa hadiah TERBESAR yang bisa didapat petani dari Oberon Spinwheel?",
-    opts: [
-      "Rp 500.000",
-      "Rp 1.000.000",
-      "Rp 250.000",
-      "Rp 2.500.000"
+      "\"Ada produk baru namanya Oberon, bagus ini.\"",
+      "\"Pak, ini bisa bikin panen aman dari kutu kebul + SEKALIAN bisa menang hadiah sampai 1 juta rupiah. Beli produknya, scan kodenya, spin — langsung dapat voucher.\"",
+      "\"Monggo Pak, silakan dibaca sendiri brosurnya.\"",
+      "\"Semua petani sudah beli, Bapak kapan?\""
     ],
     answer: 1,
-    explain: "Hadiah tertinggi adalah <strong>Rp 1.000.000</strong>. Total ada 7 denominasi: Rp 10rb, 25rb, 50rb, 100rb, 250rb, 500rb, dan 1jt. Semua langsung dalam bentuk voucher digital."
+    explain: "<strong>Hook statement yang kuat:</strong> Manfaat PRODUK (panen aman) + Manfaat PROGRAM (hadiah sampai Rp 1 juta) + Langkah SIMPEL (beli → scan → spin → voucher). Hindari pressure sosial (\"semua sudah beli\") — petani bisa ilfeel. Fokus ke <strong>value, bukan pressure.</strong>"
   },
   {
-    q: "Voucher hadiah Oberon Spinwheel bisa ditukar di mana saja? (Pilih yang PALING TEPAT)",
+    type: "knowledge",
+    q: "Hama apa yang jadi TARGET UTAMA Oberon Speed?",
     opts: [
-      "Hanya di Alfamart",
+      "Wereng coklat & walang sangit",
+      "Ulat grayak & penggerek batang",
+      "Kutu kebul (whitefly) & tungau (mites)",
+      "Busuk buah & hawar daun"
+    ],
+    answer: 2,
+    explain: "Oberon Speed = <strong>insektisida-akarisida</strong>, target utamanya <strong>kutu kebul + tungau</strong> di SEMUA stadia (telur, nimfa, dewasa) dengan efek residual panjang. Bukan untuk ulat, wereng, atau penyakit. Jangan salah positioning ke petani — ini bukan obat segala hama."
+  },
+  {
+    type: "skill",
+    q: "Kamu visit kios yang jual Oberon. Apa HAL PERTAMA yang kamu cek dan lakukan untuk maksimalkan program?",
+    opts: [
+      "Duduk, ngopi dulu, baru santai.",
+      "Langsung tagih piutang ke pemilik kios.",
+      "Cek stok Oberon di rak → pastikan QR code & banner promosi terpasang jelas → briefing singkat ke pemilik kios tentang hadiah → pastikan mereka bisa bantu petani scan.",
+      "Foto-foto kios buat laporan, lalu pergi."
+    ],
+    answer: 2,
+    explain: "<strong>Visit kios yang impactful:</strong> Cek stok (jangan sampai kosong) → QR code & banner harus MUNCUL (bukan ditumpuk produk lain) → briefing singkat ke kios (mereka bisa jadi \"agen scan\" kita) → baru laporan. Laporan tanpa aksi = visit gak efektif. Pikirin <strong>OUTCOME</strong>, bukan sekadar TASK."
+  },
+  {
+    type: "knowledge",
+    q: "Di channel mana saja voucher hadiah Oberon Spinwheel bisa ditukar?",
+    opts: [
       "Hanya di Indomaret",
+      "Hanya di Alfamart",
       "Hanya untuk pulsa & PLN",
       "Alfamart, Indomaret, Pulsa, PLN, & eWallet"
     ],
     answer: 3,
-    explain: "Voucher bisa ditukar di <strong>semua channel</strong>: Alfamart, Indomaret, Pulsa, PLN, dan eWallet. Fleksibilitas ini jadi nilai jual utama ke petani."
+    explain: "Voucher <strong>TIDAK terbatas</strong> — bisa dipakai di Alfamart, Indomaret, Pulsa, PLN, dan eWallet. Ini jadi <strong>senjata jualan</strong>: petani tidak terikat satu tempat. Pastikan kamu sebut semua channel saat pitching — ini bikin program terasa lebih <strong>bernilai dan fleksibel.</strong>"
   },
   {
-    q: "Oberon Speed efektif mengendalikan hama apa pada tanaman?",
+    type: "skill",
+    q: "Satu petani puas dengan Oberon. Bagaimana cara TERBAIK manfaatin momen ini untuk EKSPANSI ke petani lain?",
     opts: [
-      "Ulat grayak dan penggerek batang",
-      "Kutu kebul (whitefly) dan tungau (mites)",
-      "Wereng coklat dan walang sangit",
-      "Busuk buah dan hawar daun"
+      "Cuek aja — yang penting udah jual 1.",
+      "Minta testimoni video singkat dari petani itu → tanya siapa tetangga/temannya yang tanam komoditas sama → ajak petani puas jadi \"referensi jalan\" saat kamu pitch ke petani lain.",
+      "Suruh petani share ke grup WA tanpa kamu dampingi.",
+      "Kasih diskon besar-besaran ke semua petani."
     ],
     answer: 1,
-    explain: "Oberon Speed adalah <strong>insektisida-akarisida</strong> yang efektif mengendalikan <strong>kutu kebul (whitefly) dan tungau (mites)</strong> di berbagai stadia — termasuk telur, nimfa, dan dewasa. Bukan untuk ulat, wereng, atau penyakit."
+    explain: "<strong>Social proof = alat jualan paling kuat.</strong> Petani percaya petani lain, bukan sales. Minta testimoni singkat (video 30 detik sudah cukup) → tanya siapa yang bisa direferensikan → ajak petani puas jadi \"duta\" informal. Ini strategi <strong>low-cost, high-impact</strong> yang sering dilupakan DR."
   },
   {
-    q: "Apa keunggulan utama Oberon Speed dibandingkan insektisida biasa?",
+    type: "knowledge",
+    q: "Apa KONSEKUENSI kalau petani beli Oberon Speed 200ml tapi TIDAK scan QR code?",
     opts: [
-      "Hanya membunuh telur hama",
-      "Hanya bekerja sebagai racun kontak",
-      "Bisa membunuh SEMUA stadia hama (telur, nimfa, dewasa) + residual panjang",
-      "Hanya efektif di musim hujan"
+      "Tetap otomatis dapat hadiah",
+      "Nama petani tetap masuk database",
+      "Kios yang otomatis daftarkan",
+      "Petani TIDAK bisa spin & TIDAK dapat hadiah — uang hangus"
     ],
-    answer: 2,
-    explain: "Oberon Speed bekerja di <strong>semua stadia</strong> — telur, nimfa, dan dewasa — dengan <strong>efek residual panjang</strong>. Mode aksi: inhibitor biosintesis lipid (IRAC Group 23). Bukan hanya kontak, bukan hanya telur."
-  },
-  {
-    q: "Pada tanaman kacang hijau, kapan waktu aplikasi Oberon Speed yang direkomendasikan?",
-    opts: [
-      "Saat tanam (H+0)",
-      "H+15 dan H+22 setelah tanam",
-      "H+45 menjelang panen",
-      "Kapan saja, tidak ada aturan khusus"
-    ],
-    answer: 1,
-    explain: "Rekomendasi aplikasi Oberon Speed pada kacang hijau adalah <strong>H+15 dan H+22</strong> setelah tanam — timing ini penting agar perlindungan optimal di fase vegetatif saat serangan kutu kebul dan tungau mulai muncul."
-  },
-  {
-    q: "Apa yang terjadi kalau petani membeli Oberon Speed 200ml tapi TIDAK scan QR code?",
-    opts: [
-      "Tetap dapat hadiah otomatis",
-      "Nama tetap masuk undian",
-      "Tidak bisa ikut spinwheel & tidak dapat hadiah",
-      "Kios yang akan daftarkan otomatis"
-    ],
-    answer: 2,
-    explain: "Tanpa scan QR code dan isi data via TANIA, petani <strong>TIDAK bisa ikut spinwheel dan TIDAK dapat hadiah</strong>. DR harus pastikan setiap petani yang beli langsung scan di tempat — jangan ditunda!"
-  },
-  {
-    q: "1 botol Oberon Speed 100ml cukup untuk lahan seluas?",
-    opts: [
-      "1 hektar",
-      "¼ hektar",
-      "½ hektar",
-      "2 hektar"
-    ],
-    answer: 1,
-    explain: "1 botol Oberon Speed = <strong>100ml</strong>, cukup untuk <strong>¼ hektar</strong>. Oberon hanya ada 1 kemasan: 100ml/botol. Kalau butuh ½ hektar = 2 botol. Jangan under-dose!"
+    answer: 3,
+    explain: "<strong>No scan = no reward. No exception.</strong> Ini bukan cuma soal petani — ini soal <strong>KPI DR</strong>. Setiap botol yang terjual tanpa scan = lost opportunity untuk kita. Pastiin setiap transaksi langsung di-scan di tempat. Jangan bilang \"nanti aja\" — itu recipe untuk kehilangan data."
   }
 ];
 
-// ====== STATE ======
-let currentQ = 0, score = 0, answers = [], timerInterval = null, timeLeft = 20, answered = false;
-let confidence = 0;
-let playerName = "";
+// ═══════════ STATE ═══════════
+let currentQ = 0, score = 0, answers = [], answered = false;
+let knowledgeScore = 0, skillScore = 0;
+let confidence = 0, playerName = "";
 
-// ====== SCREENS ======
+// ═══════════ SCREENS ═══════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-// ====== START ======
+// ═══════════ START ═══════════
 function startQuiz() {
   playerName = document.getElementById('nameInput').value.trim();
   if (!playerName) {
@@ -381,7 +486,8 @@ function startQuiz() {
   }
   document.getElementById('nameError').style.display = 'none';
   
-  currentQ = 0; score = 0; answers = []; confidence = 0;
+  currentQ = 0; score = 0; knowledgeScore = 0; skillScore = 0;
+  answers = []; confidence = 0;
   document.getElementById('submitStatus').textContent = '';
   document.getElementById('submitStatus').className = 'submit-status';
   document.getElementById('freeQuestion').value = '';
@@ -392,16 +498,25 @@ function startQuiz() {
   showQuestion();
 }
 
-// ====== SHOW QUESTION ======
+// ═══════════ SHOW QUESTION ═══════════
 function showQuestion() {
-  answered = false; timeLeft = 20;
+  answered = false;
   const q = questions[currentQ];
   
   document.getElementById('progress').textContent = `${currentQ+1}/10`;
-  document.getElementById('qNum').textContent = `PERTANYAAN ${currentQ+1}`;
+  document.getElementById('progressBar').style.width = `${(currentQ+1)*10}%`;
+  
+  // tag
+  const tag = document.getElementById('qTag');
+  if (q.type === 'knowledge') {
+    tag.textContent = '📚 PRODUCT KNOWLEDGE';
+    tag.className = 'q-tag knowledge';
+  } else {
+    tag.textContent = '🎯 SKILL LAPANGAN';
+    tag.className = 'q-tag skill';
+  }
+  
   document.getElementById('qText').textContent = q.q;
-  document.getElementById('timer').textContent = `⏱ ${timeLeft}`;
-  document.getElementById('timer').className = 'quiz-timer';
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('feedback').style.display = 'none';
   document.getElementById('btnNext').classList.remove('show');
@@ -411,49 +526,49 @@ function showQuestion() {
   q.opts.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option';
-    btn.textContent = `${i+1}. ${opt}`;
+    btn.textContent = opt;
     btn.onclick = () => selectAnswer(i);
     optsDiv.appendChild(btn);
   });
-  
-  startTimer();
-}
-
-function startTimer() {
-  // Timer dimatikan — biar DR santai tanpa diburu-buru
-  clearInterval(timerInterval);
-}
-
-function timeUp() {
-  // Timer dimatikan — fungsi tidak dipanggil lagi
 }
 
 function selectAnswer(index) {
   if (answered) return;
-  answered = true; clearInterval(timerInterval);
+  answered = true;
   const q = questions[currentQ], correct = index === q.answer;
+  
   document.querySelectorAll('.option').forEach(o => o.disabled = true);
   document.querySelectorAll('.option')[q.answer].classList.add('correct');
-  if (correct) { score++; }
-  else { document.querySelectorAll('.option')[index].classList.add('wrong'); }
-  answers.push({ q: currentQ, correct, userAnswer: index });
+  if (correct) {
+    score++;
+    if (q.type === 'knowledge') knowledgeScore++;
+    else skillScore++;
+  } else {
+    document.querySelectorAll('.option')[index].classList.add('wrong');
+  }
+  answers.push({ q: currentQ, correct, userAnswer: index, type: q.type });
   showFeedback(correct);
 }
 
 function showFeedback(correct) {
   const q = questions[currentQ];
-  const fb = document.getElementById('feedback'), fbTitle = document.getElementById('fbTitle'), fbText = document.getElementById('fbText');
+  const fb = document.getElementById('feedback'), fbIcon = document.getElementById('fbIcon'),
+        fbTitle = document.getElementById('fbTitle'), fbText = document.getElementById('fbText');
   fb.style.display = 'block';
   if (correct) {
-    fb.className = 'feedback correct-fb'; fbTitle.textContent = '✅ Benar!';
+    fb.className = 'feedback correct-fb';
+    fbIcon.textContent = '✅';
+    fbTitle.textContent = 'Tepat!';
   } else {
     fb.className = 'feedback wrong-fb';
-    fbTitle.textContent = '❌ Kurang Tepat';
+    fbIcon.textContent = '💡';
+    fbTitle.textContent = 'Perhatikan ya';
   }
   fbText.innerHTML = q.explain;
+  
   const btn = document.getElementById('btnNext');
   btn.classList.add('show');
-  btn.textContent = currentQ < 9 ? 'Lanjut →' : 'Lihat Hasil 🏁';
+  btn.textContent = currentQ < 9 ? 'Soal Berikutnya →' : 'Lihat Hasil 🏁';
 }
 
 function nextQuestion() {
@@ -462,60 +577,81 @@ function nextQuestion() {
   else showQuestion();
 }
 
-// ====== RESULT ======
+// ═══════════ RESULT ═══════════
 function showResult() {
-  clearInterval(timerInterval);
   showScreen('screen-result');
   document.getElementById('scoreNum').textContent = score;
+  
   const pct = score/10;
-  let title, desc;
-  if (pct >= 0.9) { title = 'Luar Biasa! 🌟'; desc = 'Kamu paham banget program Oberon Spinwheel.'; }
-  else if (pct >= 0.7) { title = 'Bagus! 👍'; desc = 'Pemahamanmu cukup baik. Review yang salah ya.'; }
-  else if (pct >= 0.5) { title = 'Lumayan 📖'; desc = 'Masih ada beberapa poin yang perlu dipelajari.'; }
-  else { title = 'Perlu Belajar Lagi 💪'; desc = 'Yuk pelajari ulang mekanisme programnya.'; }
-  document.getElementById('resultTitle').textContent = title;
+  let title, desc, emoji;
+  if (pct >= 0.9) { title = 'Luar Biasa!'; emoji = '🌟'; desc = 'Kamu siap tempur di lapangan — product knowledge & skill mantap.'; }
+  else if (pct >= 0.7) { title = 'Bagus!'; emoji = '👍'; desc = 'Sebagian besar sudah paham. Review yang salah untuk improve.'; }
+  else if (pct >= 0.5) { title = 'Lumayan'; emoji = '📖'; desc = 'Beberapa area perlu dipelajari lagi — terutama bagian yang salah.'; }
+  else { title = 'Ayo Belajar Lagi'; emoji = '💪'; desc = 'Masih banyak yang perlu dipahami. Diskusi sama Bang Irham ya.'; }
+  document.getElementById('resultTitle').textContent = `${emoji} ${title}`;
   document.getElementById('resultDesc').textContent = desc;
-
+  
+  // confetti for high scores
+  const confettiRow = document.getElementById('confettiRow');
+  if (pct >= 0.8) {
+    const confettis = ['🎉','🏆','✨','🎯','💚','🌟','🎡'];
+    confettiRow.innerHTML = confettis.map((c,i) => 
+      `<span class="confetti" style="--d:${i*0.2}s">${c}</span>`
+    ).join('');
+  } else {
+    confettiRow.innerHTML = '';
+  }
+  
+  // breakdown
+  document.getElementById('breakdown').innerHTML = `
+    <span class="break-chip know">📚 Knowledge: ${knowledgeScore}/5</span>
+    <span class="break-chip skill">🎯 Skill DR: ${skillScore}/5</span>
+  `;
+  
+  // review
   const reviewDiv = document.getElementById('reviewList');
   reviewDiv.innerHTML = '<h3>📋 Review Jawaban</h3>';
   answers.forEach(a => {
     const q = questions[a.q], icon = a.correct ? '✅' : '❌', cls = a.correct ? 'r-correct' : 'r-wrong';
+    const typeLabel = q.type === 'knowledge' ? '[Knowledge]' : '[Skill]';
     const div = document.createElement('div');
     div.className = `review-item ${cls}`;
-    div.innerHTML = `<div class="review-q">${icon} Q${a.q+1}: ${q.q}</div><div class="review-a">Jawaban: <strong>${q.opts[q.answer]}</strong></div>`;
+    div.innerHTML = `<div class="review-q">${icon} ${typeLabel} ${q.q}</div><div class="review-a">Jawaban benar: <strong>${q.opts[q.answer]}</strong></div>`;
     reviewDiv.appendChild(div);
   });
 }
 
-// ====== STARS ======
+// ═══════════ STARS ═══════════
 function setStars(n) {
   confidence = n;
   document.querySelectorAll('.star').forEach((s, i) => {
     s.classList.toggle('active', i < n);
   });
 }
-
 function resetStars() {
   confidence = 0;
   document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
 }
 
-// ====== SUBMIT ======
+// ═══════════ SUBMIT ═══════════
 async function submitResults() {
   const btn = document.getElementById('btnSubmit');
   const status = document.getElementById('submitStatus');
   
   const payload = {
     nama: playerName,
+    quiz_version: "v2-dr-edition",
     score: score,
     total: questions.length,
+    knowledge_score: knowledgeScore,
+    skill_score: skillScore,
     confidence: confidence,
     pertanyaan: document.getElementById('freeQuestion').value.trim(),
     answers: answers.map(a => ({
       q: a.q,
       question: questions[a.q].q,
+      type: questions[a.q].type,
       correct: a.correct,
-      userAnswer: a.userAnswer >= 0 ? questions[a.q].opts[a.userAnswer] : '',
       correctAnswer: questions[a.q].opts[questions[a.q].answer]
     }))
   };
@@ -526,15 +662,11 @@ async function submitResults() {
   status.className = 'submit-status';
 
   try {
-    // Fetch backend URL dari config (auto-update oleh watchdog)
-    let backendUrl = 'https://85c8fe5765793d.lhr.life'; // fallback
+    let backendUrl = 'https://85c8fe5765793d.lhr.life';
     try {
       const cfg = await fetch('backend.json');
-      if (cfg.ok) {
-        const data = await cfg.json();
-        backendUrl = data.backend_url;
-      }
-    } catch(e) { /* pakai fallback */ }
+      if (cfg.ok) { const data = await cfg.json(); backendUrl = data.backend_url; }
+    } catch(e) {}
     const res = await fetch(backendUrl + '/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
